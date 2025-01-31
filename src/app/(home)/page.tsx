@@ -1,6 +1,84 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
+import ProductCard, { Product } from "./components/ProductCard";
+
+// Demo list of product
+const products: Product[] = [
+  {
+    id: "1",
+    name: "Margarita Pizza",
+    description: "This is a very tasty pizza",
+    image: "/pizza-main.png",
+    price: 500,
+  },
+  {
+    id: "2",
+    name: "Margarita Pizza",
+    description: "This is a very tasty pizza",
+    image: "/pizza-main.png",
+    price: 500,
+  },
+  {
+    id: "3",
+    name: "Margarita Pizza",
+    description: "This is a very tasty pizza",
+    image: "/pizza-main.png",
+    price: 500,
+  },
+  {
+    id: "4",
+    name: "Margarita Pizza",
+    description: "This is a very tasty pizza",
+    image: "/pizza-main.png",
+    price: 500,
+  },
+  {
+    id: "5",
+    name: "Margarita Pizza",
+    description: "This is a very tasty pizza",
+    image: "/pizza-main.png",
+    price: 500,
+  },
+];
+
+const beverages: Product[] = [
+  {
+    id: "1",
+    name: "Classic Cold Coffee",
+    description: "Cold and Refreshing Coffee",
+    image: "/beverages.png",
+    price: 80,
+  },
+  {
+    id: "2",
+    name: "Classic Cold Coffee",
+    description: "Cold and Refreshing Coffee",
+    image: "/beverages.png",
+    price: 80,
+  },
+  {
+    id: "3",
+    name: "Classic Cold Coffee",
+    description: "Cold and Refreshing Coffee",
+    image: "/beverages.png",
+    price: 80,
+  },
+  {
+    id: "4",
+    name: "Classic Cold Coffee",
+    description: "Cold and Refreshing Coffee",
+    image: "/beverages.png",
+    price: 80,
+  },
+  {
+    id: "5",
+    name: "Classic Cold Coffee",
+    description: "Cold and Refreshing Coffee",
+    image: "/beverages.png",
+    price: 80,
+  },
+];
 
 export default function Home() {
   return (
@@ -32,7 +110,7 @@ export default function Home() {
 
       <section>
         <div className="container py-12">
-          <Tabs defaultValue="pizza" className="w-[400px]">
+          <Tabs defaultValue="pizza">
             <TabsList>
               <TabsTrigger value="pizza" className="text-md">
                 Pizza
@@ -41,9 +119,19 @@ export default function Home() {
                 Beverages
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="pizza">pizza list goes here...</TabsContent>
+            <TabsContent value="pizza">
+              <div className="grid grid-cols-4 gap-6 mt-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </TabsContent>
             <TabsContent value="beverages">
-              beverages list goes here...
+              <div className="grid grid-cols-4 gap-6 mt-6">
+                {beverages.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
