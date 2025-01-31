@@ -13,6 +13,14 @@ export default {
       fontFamily: {
         manrope: ["var(--font-manrope)", ...fontFamily.sans],
       },
+      container: {
+        center: true, // Centers the container on the page
+        screens: {
+          sm: "100%", // Full width on small screens
+          md: "768px", // Medium screens have max width of 768px
+          lg: "1024px", // Customize max width for lg breakpoint
+        },
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
