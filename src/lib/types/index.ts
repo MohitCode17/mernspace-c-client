@@ -42,3 +42,10 @@ export type Product = {
   image: string;
   isPublish: boolean;
 };
+
+export type Topping = {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+};
