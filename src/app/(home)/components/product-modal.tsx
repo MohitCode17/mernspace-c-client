@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +15,20 @@ import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product } from "@/lib/types";
 
+type ChosenConfig = {
+  [key: string]: string;
+};
+
 const ProductModal = ({ product }: { product: Product }) => {
+  const [chosenConfig, setChosenConfig] = useState<ChosenConfig>();
+
+  const handleRadioChange = (key: string, data: string) => {
+    setChosenConfig((prev) => ({
+      ...prev,
+      [key]: data,
+    }));
+  };
+
   return (
     <Dialog>
       <DialogTrigger className="bg-orange-200 hover:bg-orange-300 text-orange-500 px-4 py-1.5 rounded-full shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
@@ -40,6 +55,9 @@ const ProductModal = ({ product }: { product: Product }) => {
                   <h4 className="mt-6">Choose the {key}</h4>
                   <RadioGroup
                     defaultValue={value.availableOptions[0]}
+                    onValueChange={(data) => {
+                      handleRadioChange(key, data);
+                    }}
                     className="grid grid-cols-3 gap-4 mt-2"
                   >
                     {value.availableOptions.map((option) => (
