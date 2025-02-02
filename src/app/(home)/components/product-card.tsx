@@ -17,38 +17,34 @@ import React from "react";
 import ToppingList from "./topping-list";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
-
-export type Product = {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  price: number;
-};
+import { Product } from "@/lib/types";
 
 type PropTypes = { product: Product };
 
 const ProductCard = ({ product }: PropTypes) => {
   return (
     <Card className="border-none">
-      <CardHeader className="flex items-center justify-center">
-        <Image
-          src={product.image}
-          alt={product.name}
-          width={150}
-          height={150}
-        />
+      <CardHeader className="flex items-center justify-center h-44">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <Image
+            src={product.image}
+            alt={product.name}
+            width={150}
+            height={150}
+            className="object-cover max-h-full max-w-full"
+          />
+        </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="mt-2">
         <h1 className="text-xl font-bold">{product.name}</h1>
-        <p className="mt-2">{product.description}</p>
+        <p className="mt-2 text-sm line-clamp-2">{product.description}</p>
       </CardContent>
       <CardFooter className="flex items-center justify-between mt-2">
-        <p>₹{product.price}</p>
+        <p>₹{100}</p>
 
         <Dialog>
-          <DialogTrigger className="bg-orange-200 hover:bg-orange-300 text-orange-500 px-6 py-2 rounded-full shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
+          <DialogTrigger className="bg-orange-200 hover:bg-orange-300 text-orange-500 px-4 py-1.5 rounded-full shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
             Choose
           </DialogTrigger>
           <DialogContent className="max-w-3xl p-0">

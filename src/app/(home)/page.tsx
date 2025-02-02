@@ -1,87 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import ProductCard, { Product } from "./components/product-card";
-import { Category } from "@/lib/types";
-
-// Demo list of product
-const products: Product[] = [
-  {
-    id: "1",
-    name: "Margarita Pizza",
-    description: "This is a very tasty pizza",
-    image: "/pizza-main.png",
-    price: 500,
-  },
-  {
-    id: "2",
-    name: "Margarita Pizza",
-    description: "This is a very tasty pizza",
-    image: "/pizza-main.png",
-    price: 500,
-  },
-  {
-    id: "3",
-    name: "Margarita Pizza",
-    description: "This is a very tasty pizza",
-    image: "/pizza-main.png",
-    price: 500,
-  },
-  {
-    id: "4",
-    name: "Margarita Pizza",
-    description: "This is a very tasty pizza",
-    image: "/pizza-main.png",
-    price: 500,
-  },
-  {
-    id: "5",
-    name: "Margarita Pizza",
-    description: "This is a very tasty pizza",
-    image: "/pizza-main.png",
-    price: 500,
-  },
-];
-
-const beverages: Product[] = [
-  {
-    id: "1",
-    name: "Classic Cold Coffee",
-    description: "Cold and Refreshing Coffee",
-    image: "/beverages.png",
-    price: 80,
-  },
-  {
-    id: "2",
-    name: "Classic Cold Coffee",
-    description: "Cold and Refreshing Coffee",
-    image: "/beverages.png",
-    price: 80,
-  },
-  {
-    id: "3",
-    name: "Classic Cold Coffee",
-    description: "Cold and Refreshing Coffee",
-    image: "/beverages.png",
-    price: 80,
-  },
-  {
-    id: "4",
-    name: "Classic Cold Coffee",
-    description: "Cold and Refreshing Coffee",
-    image: "/beverages.png",
-    price: 80,
-  },
-  {
-    id: "5",
-    name: "Classic Cold Coffee",
-    description: "Cold and Refreshing Coffee",
-    image: "/beverages.png",
-    price: 80,
-  },
-];
+import ProductCard from "./components/product-card";
+import { Category, Product } from "@/lib/types";
 
 export default async function Home() {
+  // TODO: DO CONCURRENT REQUEST -> USING PROMISE.ALL()
+
   // FETCH CATEGORIES
   const categoriesResponse = await fetch(
     `${process.env.BACKEND_URL}/api/catalog/categories`,
@@ -97,6 +22,24 @@ export default async function Home() {
   }
 
   const categories: Category[] = await categoriesResponse.json();
+
+  // FETCH PRODUCTS
+  // TODO: ADD PAGINATION IF REQUIRED
+  // TODO: **ADD DYNAMIC TENANT ID AS PER USER SELECTION ON TENANTS
+  const productsResponse = await fetch(
+    `${process.env.BACKEND_URL}/api/catalog/products?limit=100&tenantId=1`,
+    {
+      next: {
+        revalidate: 3600,
+      },
+    }
+  );
+
+  if (!productsResponse.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
+  const products: { data: Product[] } = await productsResponse.json();
 
   return (
     <>
@@ -129,7 +72,7 @@ export default async function Home() {
       {/* CATEGORY TABS AND PRODUCT RELATED TO CATEGORY */}
       <section>
         <div className="container py-12">
-          <Tabs defaultValue="pizza">
+          <Tabs defaultValue={categories[0]._id}>
             <TabsList>
               {categories.map((category) => (
                 <TabsTrigger
@@ -141,20 +84,18 @@ export default async function Home() {
                 </TabsTrigger>
               ))}
             </TabsList>
-            <TabsContent value="pizza">
-              <div className="grid grid-cols-4 gap-6 mt-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="beverages">
-              <div className="grid grid-cols-4 gap-6 mt-6">
-                {beverages.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </TabsContent>
+
+            {categories.map((category) => (
+              <TabsContent key={category._id} value={category._id}>
+                <div className="grid grid-cols-4 gap-6 mt-6">
+                  {products.data
+                    .filter((product) => product.category._id === category._id)
+                    .map((product) => (
+                      <ProductCard key={product._id} product={product} />
+                    ))}
+                </div>
+              </TabsContent>
+            ))}
           </Tabs>
         </div>
       </section>
