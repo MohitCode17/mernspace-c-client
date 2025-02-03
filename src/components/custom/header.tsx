@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -10,23 +11,48 @@ import Link from "next/link";
 import { Phone } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tenant } from "@/lib/types";
-import CartCounter from "./cart-counter";
+import dynamic from "next/dynamic";
 
-const Header = async () => {
-  const tenantsResponse = await fetch(
-    `${process.env.BACKEND_URL}/api/auth/tenants?perPage=100`,
-    {
-      next: {
-        revalidate: 3600, // 1hr
-      },
-    }
-  );
+// FIX: FOR HYDRATION ERROR AS SERVER HTML DOESN'T MATCHED WITH CLIENT
+const CartCountWithoutSSR = dynamic(() => import("./cart-counter"), {
+  ssr: false,
+});
 
-  if (!tenantsResponse.ok) {
-    throw new Error("Failed to fetch restaurants");
-  }
+const Header = () => {
+  const [tenants, setTenants] = useState<Tenant[]>([]);
 
-  const tenants: { data: Tenant[] } = await tenantsResponse.json();
+  useEffect(() => {
+    const fetchTenants = async () => {
+      try {
+        const tenantsResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/tenants?perpage=100`
+        );
+
+        const tenantsData = await tenantsResponse.json();
+
+        setTenants(tenantsData?.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchTenants();
+  }, []);
+
+  // const tenantsResponse = await fetch(
+  //   `${process.env.BACKEND_URL}/api/auth/tenants?perPage=100`,
+  //   {
+  //     next: {
+  //       revalidate: 3600, // 1hr
+  //     },
+  //   }
+  // );
+
+  // if (!tenantsResponse.ok) {
+  //   throw new Error("Failed to fetch restaurants");
+  // }
+
+  // const tenants: { data: Tenant[] } = await tenantsResponse.json();
 
   return (
     <header className="bg-white">
@@ -59,7 +85,7 @@ const Header = async () => {
               <SelectValue placeholder="Select Restaurant" />
             </SelectTrigger>
             <SelectContent>
-              {tenants?.data.map((tenant) => (
+              {tenants?.map((tenant) => (
                 <SelectItem value="spicy-corner" key={tenant.id}>
                   {tenant.name}
                 </SelectItem>
@@ -77,7 +103,7 @@ const Header = async () => {
             </li>
           </ul>
 
-          <CartCounter />
+          <CartCountWithoutSSR />
 
           <div className="flex items-center ml-6">
             <Phone size={20} className="hover:text-primary" />
