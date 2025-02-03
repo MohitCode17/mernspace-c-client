@@ -22,7 +22,18 @@ type ChosenConfig = {
 };
 
 const ProductModal = ({ product }: { product: Product }) => {
-  const [chosenConfig, setChosenConfig] = useState<ChosenConfig>();
+  // DEFAULT CONFIFURATION
+  const defaultConfiguration = Object.entries(
+    product.category.priceConfiguration
+  )
+    .map(([key, value]) => {
+      return { [key]: value.availableOptions[0] };
+    })
+    .reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+  const [chosenConfig, setChosenConfig] = useState<ChosenConfig>(
+    defaultConfiguration as unknown as ChosenConfig
+  );
   const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
   const dispatch = useAppDispatch();
 
