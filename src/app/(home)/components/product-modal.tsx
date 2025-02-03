@@ -13,7 +13,7 @@ import Image from "next/image";
 import ToppingList from "./topping-list";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/lib/types";
+import { Product, Topping } from "@/lib/types";
 
 type ChosenConfig = {
   [key: string]: string;
@@ -21,12 +21,34 @@ type ChosenConfig = {
 
 const ProductModal = ({ product }: { product: Product }) => {
   const [chosenConfig, setChosenConfig] = useState<ChosenConfig>();
+  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
 
+  // HANDLE THE RADIO BUTTON
   const handleRadioChange = (key: string, data: string) => {
     setChosenConfig((prev) => ({
       ...prev,
       [key]: data,
     }));
+  };
+
+  // HANDLE TOPPING CHECKBOX
+  const handleToppingCheckbox = (topping: Topping) => {
+    // Check if topping already exist in selectedToppings list
+    const isAlreadyExists = selectedToppings.some(
+      (elem) => elem.id === topping.id
+    );
+
+    if (isAlreadyExists) {
+      // Remove from list
+      setSelectedToppings((prev) =>
+        prev.filter((elem) => elem.id !== topping.id)
+      );
+
+      return;
+    }
+
+    // Add toppings to list
+    setSelectedToppings((prev) => [...prev, topping]);
   };
 
   return (
@@ -82,7 +104,10 @@ const ProductModal = ({ product }: { product: Product }) => {
             )}
 
             {/* Toppings */}
-            <ToppingList />
+            <ToppingList
+              selectedToppings={selectedToppings}
+              handleToppingCheckbox={handleToppingCheckbox}
+            />
 
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">₹400</span>

@@ -4,8 +4,13 @@ import React, { useEffect, useState } from "react";
 import ToppingCard from "./topping-card";
 import { Topping } from "@/lib/types";
 
-const ToppingList = () => {
-  const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
+const ToppingList = ({
+  selectedToppings,
+  handleToppingCheckbox,
+}: {
+  selectedToppings: Topping[];
+  handleToppingCheckbox: (topping: Topping) => void;
+}) => {
   const [toppings, setToppings] = useState<Topping[]>([]);
 
   // FETCH TOPPINGS
@@ -19,25 +24,6 @@ const ToppingList = () => {
     };
     fetchData();
   }, []);
-
-  const handleToppingCheckbox = (topping: Topping) => {
-    // Check if topping already exist in selectedToppings list
-    const isAlreadyExists = selectedToppings.some(
-      (elem) => elem.id === topping.id
-    );
-
-    if (isAlreadyExists) {
-      // Remove from list
-      setSelectedToppings((prev) =>
-        prev.filter((elem) => elem.id !== topping.id)
-      );
-
-      return;
-    }
-
-    // Add toppings to list
-    setSelectedToppings((prev) => [...prev, topping]);
-  };
 
   return (
     <section className="mt-6">
