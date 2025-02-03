@@ -148,10 +148,19 @@ const ProductModal = ({ product }: { product: Product }) => {
             )}
 
             {/* Toppings */}
-            <ToppingList
-              selectedToppings={selectedToppings}
-              handleToppingCheckbox={handleToppingCheckbox}
-            />
+            {/* TODO: RENDER TOPPINGLIST DYNAMIC IF CATEGORY HAS TOPPINGS
+             * ADD FLAG TO BACKEND IN CATEGORY DOCUMENT *HASTOPPINGS MAKE IT TRUE AND FALSE
+             * NOW DISPLAY TOPPINGS LIST ACCORDING TO CATEGORY HASTOPPINGS OR NOT
+             *
+             * FOR NOW I HAVE TWO CATEGORY IN BACKEND PIZZA AND BEVERAGES
+             * SINCE BEVERAGES HAS NO TOPPINGS, I DISPLAY TOPPINGS FOR PIZZA CATEGORY
+             */}
+            {product.category.name === "Pizza" && (
+              <ToppingList
+                selectedToppings={selectedToppings}
+                handleToppingCheckbox={handleToppingCheckbox}
+              />
+            )}
 
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">₹{totalPrice}</span>
