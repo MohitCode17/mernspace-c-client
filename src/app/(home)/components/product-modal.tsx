@@ -23,8 +23,6 @@ type ChosenConfig = {
 };
 
 const ProductModal = ({ product }: { product: Product }) => {
-  const cartItems = useAppSelector((state) => state.cart.cartItem);
-
   // DEFAULT CONFIFURATION
   const defaultConfiguration = Object.entries(
     product.category.priceConfiguration
@@ -38,6 +36,8 @@ const ProductModal = ({ product }: { product: Product }) => {
     defaultConfiguration as unknown as ChosenConfig
   );
   const [selectedToppings, setSelectedToppings] = useState<Topping[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const cartItems = useAppSelector((state) => state.cart.cartItem);
   const dispatch = useAppDispatch();
 
   // HANDLE THE RADIO BUTTON
@@ -103,6 +103,7 @@ const ProductModal = ({ product }: { product: Product }) => {
       qty: 1,
     };
     dispatch(addToCart(itemToAdd));
+    setDialogOpen(false);
   };
 
   // COMPUTE TOTAL PRICE OF PRODUCT
@@ -124,7 +125,7 @@ const ProductModal = ({ product }: { product: Product }) => {
   }, [selectedToppings, chosenConfig, product]);
 
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger className="bg-orange-200 hover:bg-orange-300 text-orange-500 px-4 py-1.5 rounded-full shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150">
         Choose
       </DialogTrigger>
