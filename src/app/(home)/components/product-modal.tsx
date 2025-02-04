@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -11,12 +12,24 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Image from "next/image";
 import ToppingList from "./topping-list";
-import { ShoppingCart } from "lucide-react";
+import { CircleCheck, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product, Topping } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addToCart, CartItem } from "@/lib/store/features/cart/cartSlice";
 import { hashThePayload } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+
+const SucessToast = () => {
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <CircleCheck className="text-green-700" />
+        <span className="font-bold">Added to cart</span>
+      </div>
+    </>
+  );
+};
 
 type ChosenConfig = {
   [key: string]: string;
@@ -39,6 +52,7 @@ const ProductModal = ({ product }: { product: Product }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const cartItems = useAppSelector((state) => state.cart.cartItem);
   const dispatch = useAppDispatch();
+  const { toast } = useToast();
 
   // HANDLE THE RADIO BUTTON
   const handleRadioChange = (key: string, data: string) => {
@@ -105,6 +119,10 @@ const ProductModal = ({ product }: { product: Product }) => {
     dispatch(addToCart(itemToAdd));
     setSelectedToppings([]);
     setDialogOpen(false);
+    toast({
+      // @ts-expect-error
+      title: <SucessToast />,
+    });
   };
 
   // COMPUTE TOTAL PRICE OF PRODUCT
