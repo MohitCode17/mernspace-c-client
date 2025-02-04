@@ -14,14 +14,17 @@ import ToppingList from "./topping-list";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product, Topping } from "@/lib/types";
-import { useAppDispatch } from "@/lib/store/hooks";
-import { addToCart } from "@/lib/store/features/cart/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { addToCart, CartItem } from "@/lib/store/features/cart/cartSlice";
+import { hashThePayload } from "@/lib/utils";
 
 type ChosenConfig = {
   [key: string]: string;
 };
 
 const ProductModal = ({ product }: { product: Product }) => {
+  const cartItems = useAppSelector((state) => state.cart.cartItem);
+
   // DEFAULT CONFIFURATION
   const defaultConfiguration = Object.entries(
     product.category.priceConfiguration
@@ -65,14 +68,39 @@ const ProductModal = ({ product }: { product: Product }) => {
     setSelectedToppings((prev) => [...prev, topping]);
   };
 
+  // CHECK IF ANY PRODUCT COMBINATION ADDED TO CART
+  const alreadyHasInCart = useMemo(() => {
+    // CURRENT CONFIG COMBINATION THAT WE WANT TO CHECK
+    const currentConfiguration = {
+      _id: product._id,
+      name: product.name,
+      image: product.image,
+      priceConfiguration: product.priceConfiguration,
+      chosenConfiguration: {
+        priceConfiguration: { ...chosenConfig },
+        selectedToppings: selectedToppings,
+      },
+      qty: 1,
+    };
+
+    // HASH THE CURRENT CONFIG
+    const hash = hashThePayload(currentConfiguration);
+
+    return cartItems.some((item) => item.hash === hash);
+  }, [cartItems, product, chosenConfig, selectedToppings]);
+
   // HANDLE ADD TO CART FUNCTIONALITY
   const handleAddToCart = (product: Product) => {
-    const itemToAdd = {
-      product,
+    const itemToAdd: CartItem = {
+      _id: product._id,
+      name: product.name,
+      image: product.image,
+      priceConfiguration: product.priceConfiguration,
       chosenConfiguration: {
         priceConfiguration: chosenConfig!,
         selectedToppings: selectedToppings,
       },
+      qty: 1,
     };
     dispatch(addToCart(itemToAdd));
   };
@@ -164,9 +192,15 @@ const ProductModal = ({ product }: { product: Product }) => {
 
             <div className="flex items-center justify-between mt-12">
               <span className="font-bold">₹{totalPrice}</span>
-              <Button onClick={() => handleAddToCart(product)}>
+              <Button
+                className={alreadyHasInCart ? "bg-gray-700" : "bg-primary"}
+                disabled={alreadyHasInCart}
+                onClick={() => handleAddToCart(product)}
+              >
                 <ShoppingCart size={20} />
-                <span className="ml-2">Add to cart</span>
+                <span className="ml-2">
+                  {alreadyHasInCart ? "Already in cart" : "Add to cart"}
+                </span>
               </Button>
             </div>
           </div>
