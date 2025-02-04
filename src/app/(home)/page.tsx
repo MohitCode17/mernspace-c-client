@@ -3,7 +3,11 @@ import Image from "next/image";
 import ProductList from "./components/product-list";
 import { Suspense } from "react";
 
-export default function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams: { restaurantId: string };
+}) {
   return (
     <>
       {/* HERO SECTION */}
@@ -34,7 +38,7 @@ export default function Home() {
 
       {/* CATEGORY TABS AND PRODUCT RELATED TO CATEGORY */}
       <Suspense fallback={<p>Loading categories...</p>}>
-        <ProductList />
+        <ProductList searchParams={searchParams} />
       </Suspense>
     </>
   );

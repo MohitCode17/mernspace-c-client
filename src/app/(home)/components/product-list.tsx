@@ -12,9 +12,11 @@ async function fetchCategories(): Promise<Category[]> {
   return res.json();
 }
 
-async function fetchProducts(): Promise<{ data: Product[] }> {
+async function fetchProducts(
+  restaurantId: string
+): Promise<{ data: Product[] }> {
   const res = await fetch(
-    `${process.env.BACKEND_URL}/api/catalog/products?limit=100&tenantId=1`,
+    `${process.env.BACKEND_URL}/api/catalog/products?limit=100&tenantId=${restaurantId}`,
     { next: { revalidate: 3600 } }
   );
 
@@ -22,10 +24,14 @@ async function fetchProducts(): Promise<{ data: Product[] }> {
   return res.json();
 }
 
-const ProductList = async () => {
+const ProductList = async ({
+  searchParams,
+}: {
+  searchParams: { restaurantId: string };
+}) => {
   const [categories, products] = await Promise.all([
     fetchCategories(),
-    fetchProducts(),
+    fetchProducts(searchParams.restaurantId),
   ]);
 
   return (

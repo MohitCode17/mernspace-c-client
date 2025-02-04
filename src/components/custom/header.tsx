@@ -1,58 +1,31 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import React from "react";
 import Link from "next/link";
 import { Phone } from "lucide-react";
 import { Button } from "../ui/button";
 import { Tenant } from "@/lib/types";
 import dynamic from "next/dynamic";
+import TenantSelect from "./tenant-select";
 
 // FIX: FOR HYDRATION ERROR AS SERVER HTML DOESN'T MATCHED WITH CLIENT
 const CartCountWithoutSSR = dynamic(() => import("./cart-counter"), {
   ssr: false,
 });
 
-const Header = () => {
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+const Header = async () => {
+  const tenantsResponse = await fetch(
+    `${process.env.BACKEND_URL}/api/auth/tenants?perPage=100`,
+    {
+      next: {
+        revalidate: 3600, // 1hr
+      },
+    }
+  );
 
-  useEffect(() => {
-    const fetchTenants = async () => {
-      try {
-        const tenantsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/tenants?perpage=100`
-        );
+  if (!tenantsResponse.ok) {
+    throw new Error("Failed to fetch restaurants");
+  }
 
-        const tenantsData = await tenantsResponse.json();
-
-        setTenants(tenantsData?.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchTenants();
-  }, []);
-
-  // const tenantsResponse = await fetch(
-  //   `${process.env.BACKEND_URL}/api/auth/tenants?perPage=100`,
-  //   {
-  //     next: {
-  //       revalidate: 3600, // 1hr
-  //     },
-  //   }
-  // );
-
-  // if (!tenantsResponse.ok) {
-  //   throw new Error("Failed to fetch restaurants");
-  // }
-
-  // const tenants: { data: Tenant[] } = await tenantsResponse.json();
+  const tenants: { data: Tenant[] } = await tenantsResponse.json();
 
   return (
     <header className="bg-white">
@@ -80,18 +53,7 @@ const Header = () => {
             />
           </svg>
           {/* Select restaurant */}
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select Restaurant" />
-            </SelectTrigger>
-            <SelectContent>
-              {tenants?.map((tenant) => (
-                <SelectItem value="spicy-corner" key={tenant.id}>
-                  {tenant.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TenantSelect tenants={tenants} />
         </div>
         <div className="flex items-center gap-4">
           <ul className="flex space-x-4 items-center font-medium">
