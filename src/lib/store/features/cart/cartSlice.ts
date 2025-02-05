@@ -58,6 +58,18 @@ export const cartSlice = createSlice({
         (item) => item.hash === action.payload.hash
       );
 
+      if (index === -1) return;
+
+      // LOGIC TO REMOVE ITEMS FROM CART
+      if (action.payload.qty === 0) {
+        state.cartItem.splice(index, 1);
+        window.localStorage.setItem(
+          "cartItems",
+          JSON.stringify(state.cartItem)
+        );
+        return;
+      }
+
       state.cartItem[index].qty = Math.max(
         1,
         state.cartItem[index].qty + action.payload.qty
