@@ -7,9 +7,11 @@ import Image from "next/image";
 import React from "react";
 import QtyChanger from "./qtyChanger";
 import { useAppDispatch } from "@/lib/store/hooks";
+import useTotal from "@/lib/hooks/use-total";
 
 const CartItem = ({ item }: { item: Item }) => {
   const dispatch = useAppDispatch();
+  const total = useTotal(item);
 
   return (
     <>
@@ -43,7 +45,7 @@ const CartItem = ({ item }: { item: Item }) => {
             </QtyChanger>
           </div>
           <div className="flex">
-            <div className="font-bold w-12">&#8377;300</div>
+            <div className="font-bold w-12">&#8377;{total * item.qty}</div>
             <button
               className="ml-4"
               onClick={() => {
