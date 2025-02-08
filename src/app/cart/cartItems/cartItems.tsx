@@ -6,9 +6,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import CartItem from "./cartItem";
 import { Button } from "@/components/ui/button";
 import { getProductTotal } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const CartItems = () => {
   const [isClient, setIsClient] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -35,7 +39,10 @@ const CartItems = () => {
         <ShoppingCart />
         <p className="text-gray-500">
           Your cart is empty!{" "}
-          <Link className="text-orange-500" href={`/`}>
+          <Link
+            className="text-orange-500"
+            href={`/?restaurantId=${searchParams.get("restaurantId")}`}
+          >
             continue shopping?
           </Link>
         </p>
@@ -50,7 +57,13 @@ const CartItems = () => {
       ))}
       <div className="flex justify-between items-center">
         <span className="font-bold text-xl">&#8377;{finalTotal}</span>
-        <Button>
+        <Button
+          onClick={() =>
+            router.push(
+              `/checkout/?restaurantId=${searchParams.get("restaurantId")}`
+            )
+          }
+        >
           Checkout
           <ArrowRight size={16} className="ml-2" />
         </Button>
