@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { Tenant } from "@/lib/types";
 import dynamic from "next/dynamic";
 import TenantSelect from "./tenant-select";
+import { getSession } from "@/lib/session";
 
 // FIX: FOR HYDRATION ERROR AS SERVER HTML DOESN'T MATCHED WITH CLIENT
 const CartCountWithoutSSR = dynamic(() => import("./cart-counter"), {
@@ -12,6 +13,8 @@ const CartCountWithoutSSR = dynamic(() => import("./cart-counter"), {
 });
 
 const Header = async () => {
+  const session = await getSession();
+
   const tenantsResponse = await fetch(
     `${process.env.BACKEND_URL}/api/auth/tenants?perPage=100`,
     {
@@ -72,7 +75,7 @@ const Header = async () => {
             <span>+91 9800 500 400</span>
           </div>
 
-          <Button size={"sm"}>Logout</Button>
+          <Button size={"sm"}>{session ? "Logout" : "Login"}</Button>
         </div>
       </nav>
     </header>
