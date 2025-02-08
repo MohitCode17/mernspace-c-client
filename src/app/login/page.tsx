@@ -3,10 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import login from "@/lib/actions/login";
+import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { useFormState } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
+
+const SubmitButton = () => {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button>
+      {pending ? (
+        <div className="flex items-center gap-2">
+          <LoaderCircle className="animate-spin" />
+          <span>Please wait</span>
+        </div>
+      ) : (
+        "Login"
+      )}
+    </Button>
+  );
+};
 
 const initialState = {
   type: "",
@@ -51,8 +69,7 @@ const Login = () => {
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
-              <Button>Login</Button>
-              {/* <SubmitButton state={state} /> */}
+              <SubmitButton state={state} />
             </div>
           </form>
           <div className="mt-4 text-center text-sm">
