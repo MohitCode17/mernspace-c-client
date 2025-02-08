@@ -6,6 +6,7 @@ import { Tenant } from "@/lib/types";
 import dynamic from "next/dynamic";
 import TenantSelect from "./tenant-select";
 import { getSession } from "@/lib/session";
+import Logout from "./logout";
 
 // FIX: FOR HYDRATION ERROR AS SERVER HTML DOESN'T MATCHED WITH CLIENT
 const CartCountWithoutSSR = dynamic(() => import("./cart-counter"), {
@@ -74,8 +75,13 @@ const Header = async () => {
             <Phone size={20} className="hover:text-primary" />
             <span>+91 9800 500 400</span>
           </div>
-
-          <Button size={"sm"}>{session ? "Logout" : "Login"}</Button>
+          {session ? (
+            <Logout />
+          ) : (
+            <Button size={"sm"} asChild>
+              <Link href={"/login"}>Login</Link>
+            </Button>
+          )}
         </div>
       </nav>
     </header>
