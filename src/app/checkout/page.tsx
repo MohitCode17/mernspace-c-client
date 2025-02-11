@@ -18,11 +18,17 @@ import { Coins, CreditCard, Plus } from "lucide-react";
 import { redirect } from "next/navigation";
 import React from "react";
 
-const Checkout = async () => {
+const Checkout = async ({
+  searchParams,
+}: {
+  searchParams: { restaurantId: string };
+}) => {
   const session = await getSession();
 
+  const queryString = new URLSearchParams(searchParams).toString();
+
   if (!session) {
-    redirect("/login");
+    redirect(`/login?${queryString}`);
   }
 
   return (
