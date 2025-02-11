@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LoaderCircle, Plus } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -9,13 +15,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -23,7 +24,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { addAddress } from "@/lib/http/api";
 
 const formSchema = z.object({
@@ -32,7 +33,7 @@ const formSchema = z.object({
   }),
 });
 
-const AddAddress = ({ customerId }: { customerId: string }) => {
+const AddAddress = ({ customerId }: { customerId: string | undefined }) => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -43,7 +44,8 @@ const AddAddress = ({ customerId }: { customerId: string }) => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["address", customerId],
     mutationFn: async (address: string) => {
-      return await addAddress(customerId, address);
+      // TODO: ADD PROPER CHECK FOR CUSTOMER ID, IN REAL IT CAN BE UNDEFINED TOO...
+      return await addAddress(customerId!, address);
     },
 
     onSuccess: () => {
