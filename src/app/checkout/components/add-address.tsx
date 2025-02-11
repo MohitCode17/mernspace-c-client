@@ -55,9 +55,13 @@ const AddAddress = ({ customerId }: { customerId: string | undefined }) => {
     },
   });
 
-  const handleAddressAdd = (data: z.infer<typeof formSchema>) => {
-    console.log("Data", data);
-    mutate(data.address);
+  const handleAddressAdd = (e: React.FormEvent<HTMLFormElement>) => {
+    e.stopPropagation();
+
+    return addressForm.handleSubmit((data: z.infer<typeof formSchema>) => {
+      console.log("Data", data);
+      mutate(data.address);
+    })(e);
   };
 
   return (
@@ -70,7 +74,7 @@ const AddAddress = ({ customerId }: { customerId: string | undefined }) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Form {...addressForm}>
-          <form onSubmit={addressForm.handleSubmit(handleAddressAdd)}>
+          <form onSubmit={handleAddressAdd}>
             <DialogHeader>
               <DialogTitle>Add Address</DialogTitle>
               <DialogDescription>
