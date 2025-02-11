@@ -6,6 +6,7 @@ import Header from "@/components/custom/header";
 import StoreProvider from "./StoreProvider";
 import { Toaster } from "@/components/ui/toaster";
 import Refresher from "@/components/custom/refresher";
+import QueryProvider from "./QueryProvider";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -31,13 +32,15 @@ export default function RootLayout({
             manrope.variable
           )}
         >
-          <Refresher>
-            {/* Header */}
-            <Header />
-            {/* Childrens */}
-            {children}
-            <Toaster />
-          </Refresher>
+          <QueryProvider>
+            <Refresher>
+              {/* Header */}
+              <Header />
+              {/* Childrens */}
+              {children}
+              <Toaster />
+            </Refresher>
+          </QueryProvider>
         </body>
       </StoreProvider>
     </html>
