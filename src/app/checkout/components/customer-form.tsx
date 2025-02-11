@@ -18,12 +18,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Coins, CreditCard, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getCustomer } from "@/lib/http/api";
+import { Customer } from "@/lib/types";
 
 const CustomerForm = () => {
-  const { data: customer, isLoading } = useQuery({
+  const { data: customer, isLoading } = useQuery<Customer>({
     queryKey: ["customer"],
     queryFn: async () => {
-      return await getCustomer();
+      return await getCustomer().then((res) => res.data);
     },
   });
 
@@ -45,7 +46,7 @@ const CustomerForm = () => {
                 id="fname"
                 type="text"
                 className="w-full"
-                defaultValue={customer?.data.firstName}
+                defaultValue={customer?.firstName}
                 disabled
               />
             </div>
@@ -55,7 +56,7 @@ const CustomerForm = () => {
                 id="lname"
                 type="text"
                 className="w-full"
-                defaultValue={customer?.data.lastName}
+                defaultValue={customer?.lastName}
                 disabled
               />
             </div>
@@ -65,7 +66,7 @@ const CustomerForm = () => {
                 id="email"
                 type="text"
                 className="w-full"
-                defaultValue={customer?.data.email}
+                defaultValue={customer?.email}
                 disabled
               />
             </div>
@@ -103,24 +104,21 @@ const CustomerForm = () => {
                   defaultValue="option-one"
                   className="grid grid-cols-2 gap-6 mt-2"
                 >
-                  <Card className="p-6">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="option-one" id="option-one" />
-                      <Label htmlFor="option-one" className="leading-normal">
-                        123, ABC Street, Malad West, Mumbai, Maharashtra, India
-                        400064
-                      </Label>
-                    </div>
-                  </Card>
-                  <Card className="p-6">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="option-two" id="option-two" />
-                      <Label htmlFor="option-two" className="leading-normal">
-                        Flat No. 501, Sunshine Apartments, Andheri East, Mumbai,
-                        Maharashtra, India 400069
-                      </Label>
-                    </div>
-                  </Card>
+                  {customer?.addresses.map((address) => {
+                    return (
+                      <Card className="p-6" key={address.text}>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="option-one" id="option-one" />
+                          <Label
+                            htmlFor="option-one"
+                            className="leading-normal"
+                          >
+                            {address.text}
+                          </Label>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </RadioGroup>
               </div>
             </div>
