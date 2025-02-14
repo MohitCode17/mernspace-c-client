@@ -134,7 +134,10 @@ const ProductModal = ({ product }: { product: Product }) => {
 
     const configPricing = Object.entries(chosenConfig).reduce(
       (acc, [key, value]: [string, string]) => {
-        const price = product.priceConfiguration[key].availableOptions[value];
+        const config = product.priceConfiguration[key];
+        if (!config || !config.availableOptions) return acc; // Prevent errors
+
+        const price = config.availableOptions[value] ?? 0; // Default to 0 if value is invalid
         return acc + price;
       },
       0
