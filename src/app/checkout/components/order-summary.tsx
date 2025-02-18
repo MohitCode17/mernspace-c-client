@@ -16,7 +16,11 @@ const TAX_RATE = 18;
 // TODO: DELIVERY_CHARGES CAN BE DEPENDS ON RESTAURANT, MOVE THIS LOGIC TO BACKEND (ORDER SERVICE)
 const DELIVERY_CHARGES = 50;
 
-const OrderSummary = () => {
+const OrderSummary = ({
+  handleCouponCodeChange,
+}: {
+  handleCouponCodeChange: (code: string) => void;
+}) => {
   const searchParam = useSearchParams();
 
   const [discountPercentage, setDiscountPercentage] = useState(0);
@@ -77,13 +81,16 @@ const OrderSummary = () => {
       return await verifyCoupon(data).then((res) => res.data);
     },
     onSuccess: (data) => {
-      console.log("Data", data);
       if (data.valid) {
         setDiscountError("");
+        handleCouponCodeChange(
+          couponCodeRef.current ? couponCodeRef.current.value : ""
+        );
         setDiscountPercentage(data.discount);
         return;
       }
       setDiscountError("Coupon is expired");
+      handleCouponCodeChange("");
       setDiscountPercentage(0);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
