@@ -53,7 +53,7 @@ const CustomerForm = () => {
   });
 
   // CREATE ORDER MUTATION
-  const { mutate } = useMutation({
+  const { mutate, isPending: isPlaceOrderPending } = useMutation({
     mutationKey: ["order"],
     mutationFn: async (data: OrderData) => {
       const idempotencyKey = idempotencyKeyRef.current
@@ -248,6 +248,7 @@ const CustomerForm = () => {
           </Card>
           {/* ORDER SUMMARY CARD */}
           <OrderSummary
+            isPlaceOrderPending={isPlaceOrderPending}
             handleCouponCodeChange={(code) => (chosenCouponCode.current = code)}
           />
         </div>
