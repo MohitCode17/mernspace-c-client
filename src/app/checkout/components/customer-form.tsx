@@ -1,18 +1,19 @@
 "use client";
 import React, { useRef } from "react";
 import { z } from "zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Coins, CreditCard } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { v4 as uuidv4 } from "uuid";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { getCustomer } from "@/lib/http/api";
-import { Customer } from "@/lib/types";
+import { createOrder, getCustomer } from "@/lib/http/api";
+import { Customer, OrderData } from "@/lib/types";
 import AddAddress from "./add-address";
 import {
   Form,
@@ -34,17 +35,16 @@ const formSchema = z.object({
 });
 
 const CustomerForm = () => {
-  // GETTING CART FROM STORE
   const cart = useAppSelector((state) => state.cart);
-
-  // GETTING TENANT ID FROM URL
   const searchParams = useSearchParams();
   const chosenCouponCode = useRef("");
+  const idempotencyKeyRef = useRef("");
 
   const customerForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
+  // FETCH CUSTOMER DETAILS
   const { data: customer, isLoading } = useQuery<Customer>({
     queryKey: ["customer"],
     queryFn: async () => {
@@ -52,9 +52,18 @@ const CustomerForm = () => {
     },
   });
 
-  if (isLoading) {
-    return <h3>Loading...</h3>;
-  }
+  // CREATE ORDER MUTATION
+  const { mutate } = useMutation({
+    mutationKey: ["order"],
+    mutationFn: async (data: OrderData) => {
+      const idempotencyKey = idempotencyKeyRef.current
+        ? idempotencyKeyRef.current
+        : (idempotencyKeyRef.current = uuidv4() + customer?._id);
+
+      await createOrder(data, idempotencyKey);
+    },
+    retry: 3,
+  });
 
   const handlePlaceOrder = (data: z.infer<typeof formSchema>) => {
     const tenantId = searchParams.get("restaurantId");
@@ -65,17 +74,21 @@ const CustomerForm = () => {
     }
 
     // PREPARE ORDER DATA OBJECT
-    const orderData = {
+    const orderData: OrderData = {
       cart: cart.cartItem,
       tenantId: tenantId,
-      customerId: customer?._id,
+      customerId: customer ? customer._id : "",
       address: data.address,
       paymentMode: data.paymentMode,
       comment: data.comment,
       couponCode: chosenCouponCode.current ? chosenCouponCode.current : "",
     };
-    console.log("Order Data", orderData);
+    mutate(orderData);
   };
+
+  if (isLoading) {
+    return <h3>Loading...</h3>;
+  }
 
   return (
     <Form {...customerForm}>
