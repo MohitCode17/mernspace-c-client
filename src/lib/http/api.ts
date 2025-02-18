@@ -22,10 +22,9 @@ export const addAddress = (customerId: string, address: string) =>
 export const verifyCoupon = (data: CouponCodeData) =>
   api.post(`${ORDER_SERVICE_PREFIX}/coupon/verify`, data);
 
-export const createOrder = (data: OrderData, idempotencyKey: string) => {
+export const createOrder = (data: OrderData, idempotencyKey: string) =>
   api.post(`${ORDER_SERVICE_PREFIX}/orders`, data, {
     headers: {
       "Idempotency-Key": idempotencyKey,
     },
   });
-};

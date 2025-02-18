@@ -60,9 +60,21 @@ const CustomerForm = () => {
         ? idempotencyKeyRef.current
         : (idempotencyKeyRef.current = uuidv4() + customer?._id);
 
-      await createOrder(data, idempotencyKey);
+      return await createOrder(data, idempotencyKey).then((res) => res.data);
     },
     retry: 3,
+
+    onSuccess: (data: { paymentUrl: string | null }) => {
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      }
+
+      alert("Order placed successfully!");
+
+      // TODO: THIS WILL HAPPEN IF PAYMENT MODE IS CASH
+      // TODO: 1. CLEAR THE CART
+      // TODO: 2. REDIRECT THE USER TO ORDER STATUS PAGE
+    },
   });
 
   const handlePlaceOrder = (data: z.infer<typeof formSchema>) => {
