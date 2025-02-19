@@ -23,8 +23,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import OrderSummary from "./order-summary";
-import { useAppSelector } from "@/lib/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { useSearchParams } from "next/navigation";
+import { clearCart } from "@/lib/store/features/cart/cartSlice";
 
 const formSchema = z.object({
   address: z.string({ required_error: "Please select an address." }),
@@ -35,6 +36,7 @@ const formSchema = z.object({
 });
 
 const CustomerForm = () => {
+  const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart);
   const searchParams = useSearchParams();
   const chosenCouponCode = useRef("");
@@ -70,9 +72,8 @@ const CustomerForm = () => {
       }
 
       alert("Order placed successfully!");
-
+      dispatch(clearCart());
       // TODO: THIS WILL HAPPEN IF PAYMENT MODE IS CASH
-      // TODO: 1. CLEAR THE CART
       // TODO: 2. REDIRECT THE USER TO ORDER STATUS PAGE
     },
   });
