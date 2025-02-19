@@ -77,7 +77,7 @@ const Orders = async () => {
                       <TableCell>₹{order.total}</TableCell>
                       <TableCell className="text-right">
                         <Link
-                          href={`/order/${order._id}`}
+                          href={`/orders/${order._id}`}
                           className="underline text-primary"
                         >
                           More details
