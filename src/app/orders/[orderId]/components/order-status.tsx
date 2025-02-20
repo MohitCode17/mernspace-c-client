@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Step, StepItem, Stepper } from "@/components/stepper";
+import React, { useEffect, useRef } from "react";
+import { Step, StepItem, Stepper, useStepper } from "@/components/stepper";
 import {
   CheckCheck,
   FileCheck,
@@ -30,19 +30,38 @@ const steps = [
   { label: "Delivered", icon: CheckCheck, description: "Order completed" },
 ] satisfies StepItem[];
 
+const StepperChange = () => {
+  const { nextStep } = useStepper();
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      nextStep();
+    }, 2000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current); // Cleanup interval on unmount
+      }
+    };
+  }, []);
+
+  return null;
+};
+
 const OrderStatus = () => {
   return (
     <Stepper
-      initialStep={1}
+      initialStep={0}
       steps={steps}
       variant="circle-alt"
       className="py-8"
     >
-      {steps.map(({ label, icon }) => {
-        return (
-          <Step key={label} label={label} icon={icon} checkIcon={icon}></Step>
-        );
-      })}
+      {steps.map(({ label, icon }) => (
+        <Step key={label} label={label} icon={icon} checkIcon={icon} />
+      ))}
+      <StepperChange />
     </Stepper>
   );
 };
