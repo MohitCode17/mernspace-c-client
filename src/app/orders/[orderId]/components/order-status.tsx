@@ -36,7 +36,7 @@ const statusMapping = {
   received: 0,
   confirmed: 1,
   prepared: 2,
-  out_for_deliver: 3,
+  out_for_delivery: 3,
   delivered: 4,
 } as { [key: string]: number };
 
