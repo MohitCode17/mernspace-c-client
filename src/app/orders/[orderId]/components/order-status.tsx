@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Step, StepItem, Stepper, useStepper } from "@/components/stepper";
 import {
   CheckCheck,
@@ -9,6 +9,8 @@ import {
   Package,
   PackageCheck,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getSingleOrder } from "@/lib/http/api";
 
 const steps = [
   {
@@ -30,27 +32,37 @@ const steps = [
   { label: "Delivered", icon: CheckCheck, description: "Order completed" },
 ] satisfies StepItem[];
 
-const StepperChange = () => {
-  const { nextStep } = useStepper();
+const statusMapping = {
+  received: 0,
+  confirmed: 1,
+  prepared: 2,
+  out_for_deliver: 3,
+  delivered: 4,
+} as { [key: string]: number };
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+const StepperChange = ({ orderId }: { orderId: string }) => {
+  const { setStep } = useStepper();
+
+  // GET SINGLE ORDER
+  const { data } = useQuery({
+    queryKey: ["order", orderId],
+    queryFn: async () => {
+      return await getSingleOrder(orderId).then((res) => res.data);
+    },
+    refetchInterval: 1000 * 30, // In every 30s it'll check for orderStatus changed like polling.
+  });
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      nextStep();
-    }, 2000);
+    if (data) {
+      const currentStep = statusMapping[data.orderStatus] || 0;
+      setStep(currentStep + 1);
+    }
+  }, [data, setStep]);
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current); // Cleanup interval on unmount
-      }
-    };
-  }, []);
-
-  return null;
+  return <></>;
 };
 
-const OrderStatus = () => {
+const OrderStatus = ({ orderId }: { orderId: string }) => {
   return (
     <Stepper
       initialStep={0}
@@ -61,7 +73,7 @@ const OrderStatus = () => {
       {steps.map(({ label, icon }) => (
         <Step key={label} label={label} icon={icon} checkIcon={icon} />
       ))}
-      <StepperChange />
+      <StepperChange orderId={orderId} />
     </Stepper>
   );
 };
