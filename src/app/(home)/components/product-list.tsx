@@ -5,7 +5,7 @@ import { Category, Product } from "@/lib/types";
 
 async function fetchCategories(): Promise<Category[]> {
   const res = await fetch(`${process.env.BACKEND_URL}/api/catalog/categories`, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 300 },
   });
 
   if (!res.ok) throw new Error("Failed to fetch categories");
@@ -17,7 +17,7 @@ async function fetchProducts(
 ): Promise<{ data: Product[] }> {
   const res = await fetch(
     `${process.env.BACKEND_URL}/api/catalog/products?limit=100&tenantId=${restaurantId}`,
-    { next: { revalidate: 3600 } }
+    { next: { revalidate: 300 } }
   );
 
   if (!res.ok) throw new Error("Failed to fetch products");
